@@ -1,0 +1,168 @@
+1) Ziel
+
+Eine kleine, schnelle Website (Single Page), die ein endloses Runner-Game im Stil des Chrome Offline Dino Games nachbildet: springen, ducken, Hindernissen ausweichen, Score, Game Over, Restart.
+
+2) Scope (MVP)
+
+Muss drin sein (MVP):
+
+Spiel startet per Space / Klick / Tap
+
+Dino/Runner kann springen (Space / Tap)
+
+Dino kann ducken (ArrowDown / SwipeDown optional)
+
+Hindernisse (z. B. Kakteen) kommen von rechts und bewegen sich nach links
+
+Kollisionserkennung: bei Treffer → Game Over
+
+Score steigt über Zeit (z. B. pro Sekunde / pro Frame)
+
+Highscore wird lokal gespeichert (localStorage)
+
+Restart per Space / Button
+
+Responsive: spielbar auf Desktop + Mobile
+
+Performance: flüssig auf 60fps (oder “so flüssig wie möglich”)
+
+
+Tag/Nacht-Wechsel
+
+Mehr Hindernis-Typen (Vogel / unterschiedliche Kakteen)
+
+Sound (Jump/Hit) + Toggle
+
+Schwierigkeit steigt (Speed + Spawnrate)
+
+Pause (P)
+
+Accessibility: Reduced motion Option
+
+3) Look & Feel
+
+Minimalistisch, “Chrome Offline”-Anmutung:
+
+Schwarz/Weiß/Monochrom
+
+Simple Pixel/Block-Style oder Vektor-Style (dein Call)
+
+UI-Elemente:
+
+Score oben rechts
+
+Highscore optional daneben
+
+“Press Space to start” Overlay
+
+Game Over Overlay + Restart Hinweis
+
+4) Plattform / Tech
+
+Empfehlung (einfach & schnell):
+
+HTML + CSS + Vanilla JS (Canvas oder DOM)
+
+Kein Backend nötig
+
+Hosting: statisch (z. B. GitHub Pages / Netlify / Vercel)
+
+Entscheidung: Canvas vs DOM
+
+Canvas: beste Performance, klassisch für Runner
+
+DOM: einfacher zu debuggen, aber bei vielen Objekten evtl. schlechter
+
+➡️ Für “Chrome Dino”-Feeling: Canvas bevorzugt.
+
+5) Game-Mechanik Details
+
+Game Loop
+
+requestAnimationFrame Loop
+
+Delta Time (dt) berücksichtigen, damit es bei verschiedenen FPS stabil läuft
+
+Spieler
+
+Position: x fix (z. B. 80px), y variiert
+
+Physics:
+
+gravity: z. B. 2000 px/s²
+
+jump velocity: z. B. -700 px/s
+
+ground y: feste Linie
+
+Zustände:
+
+RUNNING
+
+JUMPING
+
+DUCKING
+
+DEAD
+
+Hindernisse
+
+Spawn zufällig, aber fair:
+
+Minimaler Abstand (minDistance)
+
+Spawnrate steigt langsam
+
+Geschwindigkeit: startet moderat, steigt mit Score
+
+Hitboxen: simple Rechtecke (AABB)
+
+Collision
+
+AABB Rectangle Collision:
+
+PlayerRect vs ObstacleRect
+
+Optional: Hitbox etwas kleiner als Sprite für “fairness”
+
+Scoring
+
+Score = Zeit * Faktor (z. B. +1 pro 100ms)
+
+Highscore = max(highscore, score) in localStorage
+
+6) Input / Controls
+
+Desktop:
+
+Space / ArrowUp: Jump
+
+ArrowDown: Duck (halten)
+
+R oder Space bei GameOver: Restart
+
+Mobile:
+
+Tap: Jump
+
+Optional: SwipeDown: Duck
+
+Prevent default scrolling bei Space/ArrowDown auf der Seite
+
+7) UI / Screens
+
+Start Screen
+
+Overlay: “Press Space / Tap to start”
+
+Running
+
+Score sichtbar
+
+Game Over
+
+Overlay: “Game Over”
+
+Button: Restart
+
+Hinweis: “Press Space to restart”

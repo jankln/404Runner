@@ -1,0 +1,64 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>404 Runner</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="page">
+    <header class="hud">
+      <div class="brand">
+        <span class="brand-number">404</span> Runner
+      </div>
+      <div class="stats" aria-live="polite">
+        <span id="score" class="score">0</span>
+        <span id="highscore" class="highscore">HI 0</span>
+      </div>
+    </header>
+
+    <main class="stage">
+      <div class="game-shell">
+        <canvas id="game" role="img" aria-label="404 Runner game canvas"></canvas>
+
+        <div class="overlay" id="startOverlay">
+          <div class="overlay-card">
+            <div class="title">Press Space or Tap to start</div>
+            <div class="subtitle">ArrowUp/Space = jump, ArrowDown = duck, P = pause</div>
+          </div>
+        </div>
+
+        <div class="overlay hidden" id="pauseOverlay">
+          <div class="overlay-card">
+            <div class="title">Paused</div>
+            <div class="subtitle">Press P to resume</div>
+          </div>
+        </div>
+
+        <div class="overlay hidden" id="gameOverOverlay">
+          <div class="overlay-card">
+            <div class="title">Game Over</div>
+            <div class="subtitle">Press Space or R to restart</div>
+            <button id="restartBtn" class="btn">Restart</button>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer class="panel">
+      <label class="toggle">
+        <input type="checkbox" id="soundToggle" checked>
+        Sound
+      </label>
+      <label class="toggle">
+        <input type="checkbox" id="motionToggle">
+        Reduced motion
+      </label>
+      <div class="hint">Tap to jump. Swipe down to duck.</div>
+    </footer>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
