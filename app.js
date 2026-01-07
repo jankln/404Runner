@@ -33,6 +33,9 @@ const state = {
 const config = {
   gravity: 2000,
   jumpVelocity: -700,
+  minJumpVelocity: -280,
+  maxJumpHold: 0.18,
+  jumpHoldGravity: 0.45,
   groundPadding: 26,
   minSpawn: 0.85,
   maxSpawn: 1.6
@@ -45,7 +48,9 @@ const player = {
   h: 48,
   vy: 0,
   ducking: false,
-  onGround: true
+  onGround: true,
+  jumpHeld: false,
+  jumpHoldTime: 0
 };
 
 let view = {
@@ -108,6 +113,8 @@ function resetGame() {
   player.vy = 0;
   player.ducking = false;
   player.onGround = true;
+  player.jumpHeld = false;
+  player.jumpHoldTime = 0;
   player.h = 48;
   player.y = view.groundY - player.h;
   updateHud();
@@ -194,13 +201,20 @@ function update(dt) {
 }
 
 function updatePlayer(dt) {
-  player.vy += config.gravity * dt;
+  let gravityScale = 1;
+  if (player.jumpHeld && player.vy < 0 && player.jumpHoldTime < config.maxJumpHold) {
+    gravityScale = config.jumpHoldGravity;
+    player.jumpHoldTime += dt;
+  }
+  player.vy += config.gravity * gravityScale * dt;
   player.y += player.vy * dt;
 
   if (player.y >= view.groundY - player.h) {
     player.y = view.groundY - player.h;
     player.vy = 0;
     player.onGround = true;
+    player.jumpHeld = false;
+    player.jumpHoldTime = 0;
   } else {
     player.onGround = false;
   }
@@ -381,7 +395,16 @@ function jump() {
   }
   if (player.onGround) {
     player.vy = config.jumpVelocity;
+    player.jumpHeld = true;
+    player.jumpHoldTime = 0;
     playSound("jump");
+  }
+}
+
+function releaseJump() {
+  player.jumpHeld = false;
+  if (player.vy < 0) {
+    player.vy = Math.max(player.vy, config.minJumpVelocity);
   }
 }
 
@@ -419,11 +442,14 @@ function handleKeyUp(event) {
   if (event.code === "ArrowDown") {
     duck(false);
   }
+  if (event.code === "Space" || event.code === "ArrowUp") {
+    releaseJump();
+  }
 }
 
 function handlePointerDown(event) {
   pointerStart = { y: event.clientY, time: performance.now() };
-  if (!state.started) {
+  if (!state.started || state.running) {
     jump();
   }
 }
@@ -443,14 +469,11 @@ function handlePointerUp(event) {
     return;
   }
   const deltaY = event.clientY - pointerStart.y;
-  if (deltaY <= 40) {
-    if (state.gameOver) {
-      resetGame();
-      startGame();
-    } else {
-      jump();
-    }
+  if (state.gameOver && deltaY <= 40) {
+    resetGame();
+    startGame();
   }
+  releaseJump();
   duck(false);
   pointerStart = null;
 }
