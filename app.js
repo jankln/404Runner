@@ -38,7 +38,8 @@ const config = {
   jumpHoldGravity: 0.45,
   groundPadding: 26,
   minSpawn: 0.85,
-  maxSpawn: 1.6
+  maxSpawn: 1.6,
+  birdHeight: 54
 };
 
 const player = {
@@ -271,7 +272,7 @@ function spawnObstacle() {
     obstacle = {
       type: "bird",
       x: view.width + 40,
-      y: view.groundY - 80,
+      y: view.groundY - config.birdHeight,
       w: 34,
       h: 22,
       wingUp: true,
