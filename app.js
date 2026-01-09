@@ -3,6 +3,7 @@ const ctx = canvas.getContext("2d");
 
 const scoreEl = document.getElementById("score");
 const highscoreEl = document.getElementById("highscore");
+const gameShell = document.querySelector(".game-shell");
 const startOverlay = document.getElementById("startOverlay");
 const pauseOverlay = document.getElementById("pauseOverlay");
 const gameOverOverlay = document.getElementById("gameOverOverlay");
@@ -578,9 +579,11 @@ window.addEventListener("resize", resizeCanvas);
 mobileQuery.addEventListener("change", applyLayoutMode);
 window.addEventListener("keydown", handleKeyDown, { passive: false });
 window.addEventListener("keyup", handleKeyUp);
-canvas.addEventListener("pointerdown", handlePointerDown);
-canvas.addEventListener("pointermove", handlePointerMove);
-canvas.addEventListener("pointerup", handlePointerUp);
-canvas.addEventListener("pointercancel", handlePointerUp);
+[canvas, gameShell, startOverlay, gameOverOverlay].forEach((target) => {
+  target.addEventListener("pointerdown", handlePointerDown);
+  target.addEventListener("pointermove", handlePointerMove);
+  target.addEventListener("pointerup", handlePointerUp);
+  target.addEventListener("pointercancel", handlePointerUp);
+});
 
 init();
