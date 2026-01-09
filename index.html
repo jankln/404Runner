@@ -21,18 +21,22 @@
     <main class="stage">
       <div class="game-shell">
         <canvas id="game" role="img" aria-label="404 Runner game canvas"></canvas>
+        <div class="touch-controls" aria-hidden="true">
+          <div class="touch-zone">Tap: Jump</div>
+          <div class="touch-zone">Swipe down: Duck</div>
+        </div>
 
         <div class="overlay" id="startOverlay">
           <div class="overlay-card">
-            <div class="title">Press Space or Tap to start</div>
-            <div class="subtitle">ArrowUp/Space = jump, ArrowDown = duck, P = pause</div>
+            <div class="title" id="startTitle">Press Space or Tap to start</div>
+            <div class="subtitle" id="startSubtitle">ArrowUp/Space = jump, ArrowDown = duck, P = pause</div>
           </div>
         </div>
 
         <div class="overlay hidden" id="pauseOverlay">
           <div class="overlay-card">
             <div class="title">Paused</div>
-            <div class="subtitle">Press P to resume</div>
+            <div class="subtitle" id="pauseSubtitle">Press P to resume</div>
           </div>
         </div>
 
@@ -55,7 +59,7 @@
         <input type="checkbox" id="motionToggle">
         Reduced motion
       </label>
-      <div class="hint">Tap to jump. Swipe down to duck.</div>
+      <div class="hint" id="hintText">Tap to jump. Swipe down to duck.</div>
     </footer>
   </div>
 

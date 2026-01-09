@@ -6,9 +6,15 @@ const highscoreEl = document.getElementById("highscore");
 const startOverlay = document.getElementById("startOverlay");
 const pauseOverlay = document.getElementById("pauseOverlay");
 const gameOverOverlay = document.getElementById("gameOverOverlay");
+const startTitle = document.getElementById("startTitle");
+const startSubtitle = document.getElementById("startSubtitle");
+const pauseSubtitle = document.getElementById("pauseSubtitle");
+const hintText = document.getElementById("hintText");
 const restartBtn = document.getElementById("restartBtn");
 const soundToggle = document.getElementById("soundToggle");
 const motionToggle = document.getElementById("motionToggle");
+
+const mobileQuery = window.matchMedia("(max-width: 640px), (pointer: coarse)");
 
 const state = {
   started: false,
@@ -27,7 +33,8 @@ const state = {
   dayBlend: 1,
   groundOffset: 0,
   reducedMotion: false,
-  soundEnabled: true
+  soundEnabled: true,
+  allowPause: true
 };
 
 const config = {
@@ -78,6 +85,7 @@ function init() {
   soundToggle.checked = state.soundEnabled;
 
   resizeCanvas();
+  applyLayoutMode();
   resetGame();
   requestAnimationFrame(loop);
 }
@@ -133,7 +141,7 @@ function startGame() {
 }
 
 function pauseGame() {
-  if (!state.started || state.gameOver) {
+  if (!state.allowPause || !state.started || state.gameOver) {
     return;
   }
   state.paused = !state.paused;
@@ -160,7 +168,7 @@ function updateHud() {
 
 function updateOverlays() {
   startOverlay.classList.toggle("hidden", state.started);
-  pauseOverlay.classList.toggle("hidden", !state.paused);
+  pauseOverlay.classList.toggle("hidden", !state.paused || !state.allowPause);
   gameOverOverlay.classList.toggle("hidden", !state.gameOver);
 }
 
@@ -431,7 +439,7 @@ function handleKeyDown(event) {
     jump();
   } else if (code === "ArrowDown") {
     duck(true);
-  } else if (key.toLowerCase() === "p") {
+  } else if (key.toLowerCase() === "p" && state.allowPause) {
     pauseGame();
   } else if (key.toLowerCase() === "r" && state.gameOver) {
     resetGame();
@@ -477,6 +485,25 @@ function handlePointerUp(event) {
   releaseJump();
   duck(false);
   pointerStart = null;
+}
+
+function applyLayoutMode() {
+  const isMobile = mobileQuery.matches;
+  state.allowPause = !isMobile;
+  if (isMobile) {
+    startTitle.textContent = "Tap to start";
+    startSubtitle.textContent = "Tap to jump, swipe down to duck";
+    hintText.textContent = "Tap to jump. Swipe down to duck.";
+  } else {
+    startTitle.textContent = "Press Space or Tap to start";
+    startSubtitle.textContent = "ArrowUp/Space = jump, ArrowDown = duck, P = pause";
+    hintText.textContent = "Space/Up = jump. Down = duck. P = pause.";
+  }
+  if (!state.allowPause && state.paused) {
+    state.paused = false;
+  }
+  pauseSubtitle.textContent = "Press P to resume";
+  updateOverlays();
 }
 
 function playSound(type) {
@@ -548,6 +575,7 @@ motionToggle.addEventListener("change", (event) => {
 });
 
 window.addEventListener("resize", resizeCanvas);
+mobileQuery.addEventListener("change", applyLayoutMode);
 window.addEventListener("keydown", handleKeyDown, { passive: false });
 window.addEventListener("keyup", handleKeyUp);
 canvas.addEventListener("pointerdown", handlePointerDown);
