@@ -72,6 +72,7 @@ let view = {
 let audioCtx = null;
 let lastTime = 0;
 let pointerStart = null;
+let touchStart = null;
 
 function init() {
   state.highScore = Number(localStorage.getItem("runnerHighScore") || 0);
@@ -488,6 +489,46 @@ function handlePointerUp(event) {
   pointerStart = null;
 }
 
+function handleTouchStart(event) {
+  if (event.touches.length > 1) {
+    return;
+  }
+  const touch = event.touches[0];
+  touchStart = { y: touch.clientY, time: performance.now() };
+  if (!state.started || state.running) {
+    jump();
+  }
+  event.preventDefault();
+}
+
+function handleTouchMove(event) {
+  if (!touchStart || event.touches.length > 1 || !state.running) {
+    return;
+  }
+  const touch = event.touches[0];
+  const deltaY = touch.clientY - touchStart.y;
+  if (deltaY > 40) {
+    duck(true);
+  }
+  event.preventDefault();
+}
+
+function handleTouchEnd(event) {
+  if (!touchStart) {
+    return;
+  }
+  const touch = event.changedTouches[0];
+  const deltaY = touch ? touch.clientY - touchStart.y : 0;
+  if (state.gameOver && deltaY <= 40) {
+    resetGame();
+    startGame();
+  }
+  releaseJump();
+  duck(false);
+  touchStart = null;
+  event.preventDefault();
+}
+
 function applyLayoutMode() {
   const isMobile = mobileQuery.matches;
   state.allowPause = !isMobile;
@@ -576,7 +617,11 @@ motionToggle.addEventListener("change", (event) => {
 });
 
 window.addEventListener("resize", resizeCanvas);
-mobileQuery.addEventListener("change", applyLayoutMode);
+if (mobileQuery.addEventListener) {
+  mobileQuery.addEventListener("change", applyLayoutMode);
+} else if (mobileQuery.addListener) {
+  mobileQuery.addListener(applyLayoutMode);
+}
 window.addEventListener("keydown", handleKeyDown, { passive: false });
 window.addEventListener("keyup", handleKeyUp);
 [canvas, gameShell, startOverlay, gameOverOverlay].forEach((target) => {
@@ -584,6 +629,10 @@ window.addEventListener("keyup", handleKeyUp);
   target.addEventListener("pointermove", handlePointerMove);
   target.addEventListener("pointerup", handlePointerUp);
   target.addEventListener("pointercancel", handlePointerUp);
+  target.addEventListener("touchstart", handleTouchStart, { passive: false });
+  target.addEventListener("touchmove", handleTouchMove, { passive: false });
+  target.addEventListener("touchend", handleTouchEnd, { passive: false });
+  target.addEventListener("touchcancel", handleTouchEnd, { passive: false });
 });
 
 init();
