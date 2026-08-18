@@ -400,14 +400,22 @@ function drawObstacles() {
   }
 }
 
-function jump() {
+function jump(touchHoldSeconds = null) {
   if (!state.running) {
     startGame();
   }
   if (player.onGround) {
-    player.vy = config.jumpVelocity;
-    player.jumpHeld = true;
-    player.jumpHoldTime = 0;
+    if (typeof touchHoldSeconds === "number") {
+      const holdRatio = Math.max(0, Math.min(1, touchHoldSeconds / config.maxJumpHold));
+      player.vy =
+        config.minJumpVelocity + (config.jumpVelocity - config.minJumpVelocity) * holdRatio;
+      player.jumpHeld = false;
+      player.jumpHoldTime = config.maxJumpHold;
+    } else {
+      player.vy = config.jumpVelocity;
+      player.jumpHeld = true;
+      player.jumpHoldTime = 0;
+    }
     playSound("jump");
   }
 }
@@ -525,11 +533,12 @@ function handleTouchEnd(event) {
   }
   const touch = event.changedTouches[0];
   const deltaY = touch ? touch.clientY - touchStart.y : 0;
+  const touchHoldSeconds = (performance.now() - touchStart.time) / 1000;
   if (state.gameOver && deltaY <= 40) {
     resetGame();
     startGame();
   } else if (deltaY <= 40 && (!state.started || state.running)) {
-    jump();
+    jump(touchHoldSeconds);
   } else {
     releaseJump();
   }
