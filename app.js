@@ -459,6 +459,9 @@ function handleKeyUp(event) {
 }
 
 function handlePointerDown(event) {
+  if (event.pointerType === "touch") {
+    return;
+  }
   pointerStart = { y: event.clientY, time: performance.now() };
   if (!state.started || state.running) {
     jump();
@@ -466,6 +469,9 @@ function handlePointerDown(event) {
 }
 
 function handlePointerMove(event) {
+  if (event.pointerType === "touch") {
+    return;
+  }
   if (!pointerStart || !state.running) {
     return;
   }
@@ -476,6 +482,9 @@ function handlePointerMove(event) {
 }
 
 function handlePointerUp(event) {
+  if (event.pointerType === "touch") {
+    return;
+  }
   if (!pointerStart) {
     return;
   }
@@ -495,9 +504,6 @@ function handleTouchStart(event) {
   }
   const touch = event.touches[0];
   touchStart = { y: touch.clientY, time: performance.now() };
-  if (!state.started || state.running) {
-    jump();
-  }
   event.preventDefault();
 }
 
@@ -522,8 +528,11 @@ function handleTouchEnd(event) {
   if (state.gameOver && deltaY <= 40) {
     resetGame();
     startGame();
+  } else if (deltaY <= 40 && (!state.started || state.running)) {
+    jump();
+  } else {
+    releaseJump();
   }
-  releaseJump();
   duck(false);
   touchStart = null;
   event.preventDefault();
